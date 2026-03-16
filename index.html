@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedy's E-shop | Prestige & Direction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@700&family=Libre+Barcode+39&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-dark: #0A192F;
+            --accent-gold: #C5A059;
+            --white: #FFFFFF;
+            --bg-image: linear-gradient(rgba(10, 25, 47, 0.92), rgba(10, 25, 47, 0.92)), 
+                        url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=1200');
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            background: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--white);
+        }
+
+        .marquee {
+            background: var(--accent-gold);
+            color: var(--primary-dark);
+            padding: 8px 0;
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        header {
+            background: rgba(10, 25, 47, 0.95);
+            padding: 1rem 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 2px solid var(--accent-gold);
+        }
+
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent-gold); cursor: pointer; }
+
+        /* Accueil & Catégories */
+        .hero-section { text-align: center; padding: 60px 20px; }
+        .hero-tagline { font-style: italic; opacity: 0.9; margin-bottom: 40px; font-size: 1.2rem; max-width: 700px; margin-left: auto; margin-right: auto; }
+
+        .hero-categories {
+            display: flex; justify-content: center; gap: 20px; padding: 0 5%; flex-wrap: nowrap;
+        }
+
+        .hero-cat-btn {
+            flex: 1; padding: 40px 10px;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--accent-gold);
+            border-radius: 15px; color: white; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; font-weight: 700; font-size: 0.9rem;
+        }
+
+        .hero-cat-btn:hover { background: var(--accent-gold); color: var(--primary-dark); transform: translateY(-5px); }
+
+        /* Produits */
+        #product-section { display: none; padding: 40px 5%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .product-card { background: rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; border: 1px solid rgba(197, 160, 89, 0.2); }
+        .product-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; }
+
+        /* Facture Stylisée */
+        .invoice-container { background: white; color: black; padding: 40px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; }
+        .invoice-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 20px; margin-bottom: 20px; }
+        .barcode { font-family: 'Libre Barcode 39', cursive; font-size: 3rem; text-align: center; margin: 20px 0; }
+        .invoice-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .invoice-footer { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; font-size: 0.8rem; text-align: center; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--primary-dark); padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; border: 1px solid var(--accent-gold); max-height: 90vh; overflow-y: auto; }
+
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid var(--accent-gold); background: rgba(255,255,255,0.1); color: white; box-sizing: border-box; }
+        .btn-gold { width: 100%; padding: 14px; background: var(--accent-gold); color: var(--primary-dark); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-gold:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        @media print {
+            body * { visibility: hidden; }
+            .invoice-container, .invoice-container * { visibility: visible; }
+            .invoice-container { position: absolute; left: 0; top: 0; width: 100%; border: none; }
+            .no-print { display: none !important; }
+        }
+
+        @media (max-width: 768px) { .hero-categories { flex-wrap: wrap; } }
+    </style>
+</head>
+<body>
+
+<div class="marquee"><marquee scrollamount="4">BIENVENU CHEZ NOUS — TEDY'S E-SHOP : QUALITÉ, PRESTIGE ET SERVICE CLIENT D'EXCEPTION — VOTRE SATISFACTION EST NOTRE PRIORITÉ</marquee></div>
+
+<header>
+    <div class="logo" onclick="resetView()">TEDY'S E-SHOP</div>
+    <div style="display:flex; gap:15px; align-items:center;">
+        <span id="user-display" onclick="openModal('auth')" style="cursor:pointer; font-size: 0.8rem; color:var(--accent-gold); font-weight:700;">CONNEXION</span>
+        <span onclick="openModal('cart')" style="cursor:pointer; background:var(--accent-gold); padding:8px 20px; border-radius:30px; color:var(--primary-dark); font-weight:800; font-size: 0.8rem;">PANIER (<span id="cart-count">0</span>)</span>
+    </div>
+</header>
+
+<div id="home-content">
+    <div class="hero-section">
+        <p class="hero-tagline">"Découvrez une sélection rigoureuse des meilleures technologies et tendances mode, orchestrée par la Direction Emma Nkot."</p>
+        
+        <div class="hero-categories">
+            <div class="hero-cat-btn" onclick="filter('phone')">Rayon Téléphonie</div>
+            <div class="hero-cat-btn" onclick="filter('info')">Solutions Numériques</div>
+            <div class="hero-cat-btn" onclick="filter('mode')">Mode & Accessoires</div>
+        </div>
+    </div>
+</div>
+
+<div id="product-section">
+    <button class="btn-gold no-print" style="width:auto; padding: 10px 30px; margin-bottom: 30px;" onclick="resetView()">← Retour</button>
+    <h2 id="cat-title" style="font-family:'Playfair Display'; text-align:center; color:var(--accent-gold); font-size: 2rem;"></h2>
+    <div class="grid" id="product-grid"></div>
+</div>
+
+<div class="modal" id="mainModal">
+    <div class="modal-content">
+        <div style="text-align:right;" class="no-print"><button onclick="closeModal()" style="background:none; border:none; color:white; font-weight:bold; cursor:pointer;">FERMER</button></div>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<script>
+    let user = null;
+    let cart = [];
+    let selectedOp = "";
+
+    const products = [
+        // TELEPHONES
+        { id: 1, name: "itel A70 Pro", cat: "phone", price: 29500, img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=200" },
+        { id: 2, name: "itel P55 Gamer", cat: "phone", price: 38000, img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200" },
+        { id: 3, name: "itel RS4 Edition", cat: "phone", price: 43000, img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=200" },
+        { id: 4, name: "iPhone 15 Pro Max", cat: "phone", price: 425000, img: "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=200" },
+        { id: 5, name: "iPhone 14 Plus", cat: "phone", price: 320000, img: "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=200" },
+        { id: 6, name: "iPhone 13 Slim", cat: "phone", price: 250000, img: "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=200" },
+        { id: 7, name: "iPhone 12 Luxe", cat: "phone", price: 195000, img: "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=200" },
+        { id: 8, name: "Huawei P60 Pro", cat: "phone", price: 215000, img: "https://images.unsplash.com/photo-1565849906461-0ee43c84e1b2?w=200" },
+        { id: 9, name: "Huawei Mate 50", cat: "phone", price: 175000, img: "https://images.unsplash.com/photo-1565849906461-0ee43c84e1b2?w=200" },
+
+        // NUMERIQUE
+        { id: 10, name: "PC HP EliteBook i7", cat: "info", price: 175000, img: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=200" },
+        { id: 11, name: "PC HP Pavilion Pro", cat: "info", price: 155000, img: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=200" },
+        { id: 12, name: "PC HP Victus Gaming", cat: "info", price: 230000, img: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=200" },
+        { id: 13, name: "Lenovo ThinkPad X1", cat: "info", price: 195000, img: "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=200" },
+        { id: 14, name: "Lenovo Yoga Slim", cat: "info", price: 180000, img: "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=200" },
+        { id: 15, name: "Lenovo Legion Pro", cat: "info", price: 255000, img: "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=200" },
+        { id: 16, name: "Dell Latitude 5420", cat: "info", price: 185000, img: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=200" },
+        { id: 17, name: "Dell Inspiron 16", cat: "info", price: 160000, img: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=200" },
+        { id: 18, name: "Dell Precision Work", cat: "info", price: 280000, img: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=200" },
+        { id: 19, name: "Acer Swift 3", cat: "info", price: 135000, img: "https://images.unsplash.com/photo-1544006659-f0b21f04cb1d?w=200" },
+        { id: 20, name: "Acer Nitro V15", cat: "info", price: 210000, img: "https://images.unsplash.com/photo-1544006659-f0b21f04cb1d?w=200" },
+        { id: 21, name: "Imprimante HP Laser (x4)", cat: "info", price: 55000, img: "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=200" },
+        { id: 22, name: "Routeur TP-Link (x3)", cat: "info", price: 18500, img: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=200" },
+
+        // MODE
+        { id: 23, name: "Pantalon Chino (x4)", cat: "mode", price: 7500, img: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=200" },
+        { id: 24, name: "Chemise Slim (x3)", cat: "mode", price: 6000, img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=200" },
+        { id: 25, name: "Bottes Cuir (x4)", cat: "mode", price: 22000, img: "https://images.unsplash.com/photo-1520639889457-795689747517?w=200" },
+        { id: 26, name: "Pull Hiver (x4)", cat: "mode", price: 8500, img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=200" },
+        { id: 27, name: "Manteau Long (x2)", cat: "mode", price: 35000, img: "https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?w=200" },
+        { id: 28, name: "Sac à dos (x3)", cat: "mode", price: 12000, img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200" },
+        { id: 29, name: "Sac à main (x4)", cat: "mode", price: 18000, img: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=200" }
+    ];
+
+    function openModal(type) {
+        const body = document.getElementById('modal-body');
+        const modal = document.getElementById('mainModal');
+        let html = "";
+
+        if(type === 'auth') {
+            html = `<h3>Espace Client</h3>
+                <input type="text" id="reg-name" placeholder="Votre Nom">
+                <input type="email" id="reg-email" placeholder="Email (format valide)" oninput="checkMail()">
+                <button id="btn-reg" class="btn-gold" disabled onclick="register()">ACCÉDER AU SITE</button>`;
+        } else if(type === 'cart') {
+            let total = cart.reduce((s, i) => s + i.price, 0);
+            html = `<div class="invoice-container">
+                <div class="invoice-header">
+                    <h1 style="margin:0;">TEDY'S E-SHOP</h1>
+                    <p><i>L'excellence du numérique & du style</i></p>
+                </div>
+                <div style="margin:20px 0;">
+                    <p>Client: <b>${user || 'Passager'}</b></p>
+                    <hr style="border:1px dashed #000;">
+                    ${cart.map(i => `<div class="invoice-row"><span>${i.name}</span><b>${i.price.toLocaleString()} FCFA</b></div>`).join('')}
+                    <hr style="border:1px dashed #000;">
+                    <div class="invoice-row" style="font-size:1.2rem; margin-top:10px;"><span>TOTAL</span><b>${total.toLocaleString()} FCFA</b></div>
+                </div>
+                <div class="barcode">1234567890</div>
+                <div class="invoice-footer">
+                    <p><b>📍 Localisation :</b> Yaoundé, Cameroun - Avenue de l'Indépendance</p>
+                    <p><b>📞 Contacts :</b> +237 6XX XX XX XX / emma.nkot@tedys.com</p>
+                    <p><i>Merci de votre confiance !</i></p>
+                </div>
+            </div>
+            <div class="no-print" style="margin-top:30px;">
+                <p style="text-align:center;">Finaliser le paiement :</p>
+                <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+                    <button class="btn-gold" style="width:auto;" onclick="selectedOp='MoMo'; document.getElementById('p-field').style.display='block'">Mobile Money</button>
+                    <button class="btn-gold" style="width:auto; background:#FF6600;" onclick="selectedOp='OM'; document.getElementById('p-field').style.display='block'">Orange Money</button>
+                </div>
+                <div id="p-field" style="display:none;">
+                    <input type="number" id="pay-num" placeholder="Numéro de transfert" oninput="checkPay()">
+                    <button id="btn-dl" class="btn-gold" disabled onclick="window.print()">TÉLÉCHARGER LA FACTURE (PDF)</button>
+                </div>
+            </div>`;
+        }
+        body.innerHTML = html;
+        modal.style.display = "flex";
+    }
+
+    function checkMail() {
+        const mail = document.getElementById('reg-email').value;
+        document.getElementById('btn-reg').disabled = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail);
+    }
+
+    function register() {
+        user = document.getElementById('reg-name').value;
+        document.getElementById('user-display').innerText = user.toUpperCase();
+        closeModal();
+    }
+
+    function checkPay() {
+        const num = document.getElementById('pay-num').value;
+        document.getElementById('btn-dl').disabled = (num.length < 9);
+    }
+
+    function filter(cat) {
+        document.getElementById('home-content').style.display = 'none';
+        document.getElementById('product-section').style.display = 'block';
+        document.getElementById('cat-title').innerText = "Catalogue " + cat;
+        document.getElementById('product-grid').innerHTML = products.filter(p => p.cat === cat).map(p => `
+            <div class="product-card">
+                <img src="${p.img}">
+                <p style="font-size:0.8rem; height:35px; overflow:hidden; margin:10px 0;">${p.name}</p>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--accent-gold); font-weight:700; font-size:0.85rem;">${p.price.toLocaleString()} FCFA</span>
+                    <button onclick="addToCart(${p.id})" style="background:var(--accent-gold); border:none; padding:5px 12px; border-radius:5px; font-weight:bold; cursor:pointer;">+</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addToCart(id) {
+        cart.push(products.find(p => p.id === id));
+        document.getElementById('cart-count').innerText = cart.length;
+    }
+
+    function resetView() { document.getElementById('home-content').style.display = 'block'; document.getElementById('product-section').style.display = 'none'; }
+    function closeModal() { document.getElementById('mainModal').style.display = "none"; }
+</script>
+
+</body>
+</html>
