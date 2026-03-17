@@ -1,0 +1,386 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedy's E-shop | Boutique Officielle</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            /* Palette de couleurs demandée */
+            --gradient-start: #ff8c00; /* Orange vif */
+            --gradient-end: #87cefa;   /* Bleu ciel */
+            --white: #ffffff;
+            --light-text: #333333;
+            --bg-light: #fdfdfd;
+            --card-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            background-color: var(--bg-light);
+            color: var(--light-text);
+            scroll-behavior: smooth;
+        }
+
+        /* --- HEADER --- */
+        header {
+            /* Application du dégradé demandé */
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: var(--white);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+        }
+
+        .marquee-container {
+            background: rgba(255,255,255,0.1);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .marquee-text {
+            display: inline-block;
+            animation: scroll-left 28s linear infinite;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .nav-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+        }
+
+        .search-bar { flex-grow: 1; margin: 0 25px; }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 25px;
+            border: 1px solid #ddd;
+            outline: none;
+            background-color: var(--white);
+            transition: 0.3s;
+        }
+
+        .search-bar input:focus { box-shadow: 0 0 10px rgba(255,140,0,0.3); }
+
+        .cat-nav {
+            background: var(--white);
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 2px solid var(--gradient-start);
+        }
+
+        .cat-nav button {
+            background: linear-gradient(135deg, var(--gradient-end), #6ab9ed);
+            color: var(--light-text);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .cat-nav button:hover { 
+            background: linear-gradient(135deg, var(--gradient-start), #f59a3c); 
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* --- PRODUITS --- */
+        .container { margin-top: 180px; padding: 30px 5%; min-height: 85vh; }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #f0f0f0;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover { transform: translateY(-7px); box-shadow: var(--card-shadow); }
+        .card img { width: 100%; height: 170px; object-fit: contain; margin-bottom: 15px; }
+        .price { color: var(--gradient-start); font-weight: bold; font-size: 1.4rem; display: block; margin: 12px 0; }
+
+        .add-btn {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: var(--white);
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* --- PANIER --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 90%;
+            max-width: 490px;
+            margin: 60px auto;
+            padding: 30px;
+            border-radius: 18px;
+            border: 3px solid var(--gradient-end);
+        }
+
+        .pay-box {
+            background: #fdfdfd;
+            padding: 18px;
+            border-radius: 12px;
+            margin: 18px 0;
+            border: 1px solid #eee;
+        }
+
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #25d366;
+            color: var(--white);
+            width: 65px; height: 65px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            text-decoration: none;
+            box-shadow: 2px 7px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: var(--white);
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="marquee-container">
+            <div class="marquee-text">✨ TEDY'S E-SHOP : ORDINATEURS DE DERNIÈRE GÉNÉRATION ET SMARTPHONES NEUFS - CONFIRMEZ VOTRE ACHAT SUR WHATSAPP : 640 942 912 ✨</div>
+        </div>
+        <div class="nav-main">
+            <div style="font-size: 1.8rem; font-weight: 900; color: var(--white);">TEDY'S E-SHOP</div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Taper le nom d'un modèle..." onkeyup="filterItems()">
+            </div>
+            <button onclick="openCart()" style="background: var(--white); border:none; padding:12px 25px; border-radius:30px; cursor:pointer; font-weight:bold; color: var(--gradient-start); box-shadow: 0 3px 8px rgba(0,0,0,0.1);">
+                🛒 Mon Panier (<span id="count">0</span>)
+            </button>
+        </div>
+        <div class="cat-nav">
+            <button onclick="renderProducts('all')">Tout</button>
+            <button onclick="renderProducts('mobile')">📱 Mobiles</button>
+            <button onclick="renderProducts('info')">💻 PC</button>
+            <button onclick="renderProducts('acc')">🎧 Accessoires</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="product-grid" class="products-grid"></div>
+    </div>
+
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <h2 style="color:var(--gradient-start); margin-top:0;">Mon Récapitulatif</h2>
+            <div id="cartList" style="max-height: 220px; overflow-y:auto; border-bottom: 2px solid #eee;"></div>
+            <h3 style="text-align: right; color:var(--light-text);">Total : <span id="totalPrice">0</span> FCFA</h3>
+            
+            <div class="pay-box">
+                <p><strong>Régler ma note via :</strong></p>
+                <label style="display:block; margin:8px 0;"><input type="radio" name="pay" value="MTN Mobile Money"> 🟡 MTN Mobile Money</label>
+                <label style="display:block; margin:8px 0;"><input type="radio" name="pay" value="Orange Money"> 🟠 Orange Money</label>
+            </div>
+
+            <button class="add-btn" onclick="processCheckout()">Générer ma Facture PDF</button>
+            <button onclick="closeCart()" style="width:100%; background:none; border:none; color:grey; margin-top:10px; cursor:pointer; font-weight:bold;">Annuler</button>
+        </div>
+    </div>
+
+    <div id="qrcode" style="display:none;"></div>
+    <a href="https://wa.me/237640942912" class="whatsapp-float" target="_blank">💬</a>
+
+    <footer>
+        <p>Retrouvez-nous sur Facebook : Ted-emAa | WhatsApp : 640 942 912</p>
+        <p>&copy; 2026 Tedy's E-shop. La qualité au meilleur prix.</p>
+    </footer>
+
+    <script>
+        const catalog = [
+            // --- TÉLÉPHONES ---
+            { name: "iPhone 15 Pro Max", price: 850000, cat: "mobile", img: "iphone15.png" },
+            { name: "iPhone 14 Pro 128GB", price: 600000, cat: "mobile", img: "iphone14.png" },
+            { name: "iPhone 13 128GB", price: 380000, cat: "mobile", img: "iphone13.png" },
+            { name: "Samsung Galaxy S23 Ultra", price: 580000, cat: "mobile", img: "s23.png" },
+            { name: "Samsung Galaxy S22", price: 320000, cat: "mobile", img: "s22.png" },
+            { name: "Samsung Galaxy A54 5G", price: 215000, cat: "mobile", img: "samsung_a54.png" },
+            { name: "Tecno Camon 20 Premier", price: 155000, cat: "mobile", img: "tecno.png" },
+            { name: "Infinix Note 30", price: 130000, cat: "mobile", img: "infinix.png" },
+            { name: "Xiaomi Redmi Note 12", price: 115000, cat: "mobile", img: "redmi.png" },
+
+            // --- ORDINATEURS ---
+            { name: "HP EliteBook 840 G5 Core i5", price: 275000, cat: "info", img: "laptop.png" },
+            { name: "MacBook Air M1 256Go", price: 650000, cat: "info", img: "laptop.png" },
+            { name: "Dell Latitude 5490 8/256", price: 230000, cat: "info", img: "laptop.png" },
+            { name: "Lenovo ThinkPad X1 Carbon", price: 350000, cat: "info", img: "laptop.png" },
+            { name: "HP ProBook 450", price: 290000, cat: "info", img: "laptop.png" },
+
+            // --- ACCESSOIRES ---
+            { name: "Clavier Gamer RGB Mécanique", price: 25000, cat: "acc", img: "clavier.png" },
+            { name: "Souris Sans Fil Logitech", price: 12000, cat: "acc", img: "clavier.png" },
+            { name: "Casque JBL Tune", price: 45000, cat: "acc", img: "clavier.png" },
+            { name: "Clé USB 128 Go 3.0", price: 12000, cat: "acc", img: "clavier.png" }
+        ];
+
+        let cart = [];
+
+        function renderProducts(filter = 'all') {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = "";
+            const items = filter === 'all' ? catalog : catalog.filter(p => p.cat === filter);
+            items.forEach(p => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/200?text=IMAGE'">
+                        <h3>${p.name}</h3>
+                        <span class="price">${p.price.toLocaleString()} FCFA</span>
+                        <button class="add-btn" onclick="addToCart('${p.name}', ${p.price})">Ajouter</button>
+                    </div>`;
+            });
+        }
+
+        function filterItems() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = catalog.filter(p => p.name.toLowerCase().includes(term));
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = "";
+            filtered.forEach(p => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/200'">
+                        <h3>${p.name}</h3>
+                        <span class="price">${p.price.toLocaleString()} FCFA</span>
+                        <button class="add-btn" onclick="addToCart('${p.name}', ${p.price})">Ajouter</button>
+                    </div>`;
+            });
+        }
+
+        function addToCart(name, price) {
+            cart.push({name, price});
+            document.getElementById('count').innerText = cart.length;
+            alert(name + " ajouté à votre note !");
+        }
+
+        function openCart() {
+            const list = document.getElementById('cartList');
+            const totalDisplay = document.getElementById('totalPrice');
+            list.innerHTML = cart.length === 0 ? "<p style='text-align:center'>Votre note est vide</p>" : "";
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price;
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:5px 0;"><span>${item.name}</span><strong>${item.price.toLocaleString()}</strong></div>`;
+            });
+            totalDisplay.innerText = total.toLocaleString();
+            document.getElementById('cartModal').style.display = "block";
+        }
+
+        function closeCart() { document.getElementById('cartModal').style.display = "none"; }
+
+        function generateInvoicePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const msg = encodeURIComponent("Bonjour Tedy's E-shop, je souhaite confirmer ma commande !");
+            const whatsappUrl = `https://wa.me/237640942912?text=${msg}`;
+
+            // En-tête de la facture avec les couleurs demandées
+            doc.setFont("times", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(255, 140, 0); // Orange de votre dégradé
+            doc.text("TEDY'S E-SHOP - FACTURE", 105, 20, null, null, "center");
+            
+            const rows = cart.map(item => [item.name, "1", item.price.toLocaleString() + " FCFA"]);
+            
+            // Tableau dynamique
+            doc.autoTable({ 
+                startY: 40, 
+                head: [['Désignation de l\'article', 'Qté', 'Prix de vente']], 
+                body: rows, 
+                headStyles: { fillColor: [135, 206, 250], textColor: [0, 0, 0] } // Bleu Ciel
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 12;
+            doc.setFontSize(14);
+            doc.text(`TOTAL NET À PAYER : ${document.getElementById('totalPrice').innerText} FCFA`, 190, finalY, null, null, "right");
+
+            // Génération du QR Code
+            const qrcodeDiv = document.getElementById("qrcode");
+            qrcodeDiv.innerHTML = "";
+            new QRCode(qrcodeDiv, { text: whatsappUrl, width: 100, height: 100 });
+
+            setTimeout(() => {
+                const qrImage = qrcodeDiv.querySelector("canvas").toDataURL("image/png");
+                doc.text("Scannez pour confirmer sur WhatsApp :", 20, finalY + 20);
+                doc.addImage(qrImage, 'PNG', 20, finalY + 25, 30, 30);
+                doc.save("Facture_Tedys_Eshop.pdf");
+            }, 350);
+        }
+
+        function processCheckout() {
+            const pay = document.querySelector('input[name="pay"]:checked');
+            if(cart.length === 0 || !pay) return alert("Note vide ou moyen de paiement non sélectionné.");
+            generateInvoicePDF();
+            alert("Merci ! Votre facture PDF se télécharge. Scannez le QR Code pour me joindre.");
+            cart = []; 
+            document.getElementById('count').innerText = "0"; 
+            closeCart();
+        }
+
+        window.onload = () => renderProducts('all');
+    </script>
+</body>
+</html>
